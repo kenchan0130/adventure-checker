@@ -45,7 +45,7 @@ const getCalenderUrls = (months = 3) => {
     let dates;
     let errBody;
     try {
-      dates = responses.filter(v => !v.match('エラーが発生しました')).flatMap((res) => {
+      dates = responses.filter(v => v.trim() !== "" && !v.match('エラーが発生しました')).flatMap((res) => {
         errBody = res;
         const dom = new JSDOM(res);
         const month = dom.window.document.querySelector('.month').textContent;
