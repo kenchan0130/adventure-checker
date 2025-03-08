@@ -1,0 +1,37 @@
+name: schedule
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Cache node modules
+        id: npm-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: |
+            node_modules
+            ~/.cache
+            ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+      - name: install dependencies
+        if: ${{ steps.npm-cache.outputs.cache-hit != 'true' }}
+        run: npm ci
+      - name: run script
+        run: npm run start
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

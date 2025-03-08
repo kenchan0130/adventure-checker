@@ -1,0 +1,14 @@
+{
+  "name": "adventure-checker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "private": true,
+  "dependencies": {
+    "dayjs": "^1.11.13",
+    "jsdom": "^26.0.0"
+  }
+}
