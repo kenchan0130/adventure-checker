@@ -37,9 +37,13 @@ const getCalenderUrls = (months = 3) => {
     const urls = getCalenderUrls();
 
     const responses = await Promise.all(urls.map(async (url) => {
-      return fetch(url, {
+      const res = await fetch(url, {
         method: "GET",
-      }).then((v) => v.text());
+      });
+      if (!res.ok) {
+        return Promise.resolve("");
+      }
+      return res.text();
     }));
 
     let dates;
