@@ -42,22 +42,30 @@ const getCalenderUrls = (months = 3) => {
       }).then((v) => v.text());
     }));
 
-    const dates = responses.flatMap((res) => {
-      const dom = new JSDOM(res);
-      const month = dom.window.document.querySelector('.month').textContent;
-      const books = Array.from(dom.window.document.querySelectorAll('.book')).filter((v) => {
-        const src = v.querySelector('img').src;
-        const reservable = !!src.match('icon-reservable\.png$');
-        const limited = !!src.match('adv_000_triangle\.png$');
+    let dates;
+    let errBody;
+    try {
+      dates = responses.flatMap((res) => {
+        errBody = res;
+        const dom = new JSDOM(res);
+        const month = dom.window.document.querySelector('.month').textContent;
+        const books = Array.from(dom.window.document.querySelectorAll('.book')).filter((v) => {
+          const src = v.querySelector('img').src;
+          const reservable = !!src.match('icon-reservable\.png$');
+          const limited = !!src.match('adv_000_triangle\.png$');
 
-        return reservable || limited;
-      });
+          return reservable || limited;
+        });
 
-      return books.map((book) => {
-        const day = book.closest('td').querySelector('.day').textContent.trim();
-        return `${month}${day}日`;
+        return books.map((book) => {
+          const day = book.closest('td').querySelector('.day').textContent.trim();
+          return `${month}${day}日`;
+        });
       });
-    });
+    } catch {
+      console.log(errBody);
+      throw 'unexpected html'
+    }
 
     if (dates.length !== 0) {
       await fetch(slackWebhookUrl, {
